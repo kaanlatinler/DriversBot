@@ -5,6 +5,10 @@ const eventHandler = require('./handlers/eventHandler');
 const express = require('express');
 const app = express();
 
+app.get('/message', (req, res) => {
+  res.json({ message: 'Merhaba, bu bir Node.js ile döndürülen mesajdır!' });
+});
+
 app.listen(8080, () => {
   const client = new Client({
     intents: [
