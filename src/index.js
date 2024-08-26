@@ -2,8 +2,11 @@ require('dotenv').config();
 const { Client, IntentsBitField } = require('discord.js');
 const eventHandler = require('./handlers/eventHandler');
 
+const cors = require('cors');
 const express = require('express');
 const app = express();
+
+app.use(cors());
 
 app.get('/message', (req, res) => {
   res.json({ message: 'Merhaba, bu bir Node.js ile döndürülen mesajdır!' });
