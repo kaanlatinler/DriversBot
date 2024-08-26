@@ -92,7 +92,6 @@ module.exports = {
 
         interaction.awaitModalSubmit({
             filter: (modalInteraction) => modalInteraction.customId === "recordModal",
-            time: 30_000
         })
         .then(async (result) => {
             const priceValue = parseInt(result.fields.getTextInputValue("priceInput"));
