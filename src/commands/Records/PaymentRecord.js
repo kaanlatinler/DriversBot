@@ -1,4 +1,4 @@
-const { EmbedBuilder, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
+const { EmbedBuilder, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, time } = require('discord.js');
 const { PaymentRecords } = require('../../database/models/index');
 
 module.exports = {
@@ -92,6 +92,7 @@ module.exports = {
 
         interaction.awaitModalSubmit({
             filter: (modalInteraction) => modalInteraction.customId === "recordModal",
+            time: 120_000
         })
         .then(async (result) => {
             const priceValue = parseInt(result.fields.getTextInputValue("priceInput"));
