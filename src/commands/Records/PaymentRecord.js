@@ -86,7 +86,9 @@ module.exports = {
         const carActionRow = new ActionRowBuilder().addComponents(carInput);
         const descActionRow = new ActionRowBuilder().addComponents(descInput);
 
-        recordModal.addComponents(priceActionRow, carActionRow, descActionRow);
+        recordModal.addComponents(priceActionRow);
+        recordModal.addComponents(carActionRow);
+        recordModal.addComponents(descActionRow);
 
         await interaction.showModal(recordModal);
 
@@ -94,11 +96,11 @@ module.exports = {
             filter: (modalInteraction) => modalInteraction.customId === "recordModal",
             time: 120_000
         })
-        .then(async (result) => {
-            const priceValue = parseInt(result.fields.getTextInputValue("priceInput"));
+        .then(async (modalInteraction) => {
+            const priceValue = parseInt(modalInteraction.fields.getTextInputValue("priceInput"));
 
             if (isNaN(priceValue)) {
-                errEmbed('Not a Number', 'Please enter a valid number.', '#E72929', result);
+                errEmbed('Not a Number', 'Please enter a valid number.', '#E72929', modalInteraction);
                 return;
             }
 
@@ -107,19 +109,19 @@ module.exports = {
                     discord_id: userId,
                     username: interaction.user.username,
                     Price: priceValue,
-                    Car: result.fields.getTextInputValue("carInput"),
-                    Desc: result.fields.getTextInputValue("descInput")
+                    Car: modalInteraction.fields.getTextInputValue("carInput"),
+                    Desc: modalInteraction.fields.getTextInputValue("descInput")
                 });
 
                 if (!newRecord) {
-                    errEmbed('Error', 'An error occurred while creating record.', '#E72929', result);
+                    errEmbed('Error', 'An error occurred while creating record.', '#E72929', modalInteraction);
                 }
 
-                embed('Success', `Record has been added successfully.`, '#88D66C', result, newRecord.Car, newRecord.Price, newRecord.Desc);
+                embed('Success', `Record has been added successfully.`, '#88D66C', modalInteraction, newRecord.Car, newRecord.Price, newRecord.Desc);
 
             } catch (error) {
                 console.error(error);
-                errEmbed('Error', 'An error occurred while adding record.', '#E72929', result); 
+                errEmbed('Error', 'An error occurred while adding record.', '#E72929', modalInteraction); 
             }
         }).catch((err) => {
             console.error(err);
