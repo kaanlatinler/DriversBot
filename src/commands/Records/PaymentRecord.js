@@ -6,8 +6,6 @@ module.exports = {
     description: "Add a record",
     callback: async (client, interaction) => {
 
-        await interaction.deferReply();
-
         const errEmbed = (title, msg, color, i) => {
             const Embed = new EmbedBuilder()
             .setColor(`${color}`)
@@ -94,7 +92,6 @@ module.exports = {
 
         await interaction.showModal(recordModal);
 
-        setTimeout(() => {}, 1000);
 
         interaction.awaitModalSubmit({
             filter: (modalInteraction) => modalInteraction.customId === "recordModal",
