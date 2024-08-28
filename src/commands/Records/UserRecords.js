@@ -46,7 +46,7 @@ module.exports = {
 
             const buttonActionRow = new ActionRowBuilder().addComponents(loginButton, logoutButton);
 
-            return { embeds: [embed], components: [buttonActionRow] };
+            return { embeds: [embed], components: [buttonActionRow], ephemeral:true };
         };
 
         let latestUserRecord = await UserRecords.findOne({
@@ -78,50 +78,58 @@ module.exports = {
         });
 
         collector.on('collect', async (buttonInteraction) => {
-            if (buttonInteraction.customId === 'loginButton') {
-                await UserRecords.update({
-                    LoginHour: new Date(),
-                    isActive: true
-                }, {
-                    where: { discord_id: userId }
-                });
-
-                const updatedUser = await UserRecords.findOne({
-                    where: { discord_id: userId },
-                    order: [['createdAt', 'DESC']],
-                });
-
-                const updatedEmbed = createEmbed('User Records', 'Welcome back to the user records panel.', '#88D66C', updatedUser);
-
-                await buttonInteraction.update(updatedEmbed);
-            }
-
-            if (buttonInteraction.customId === 'logoutButton') {
-                const user = await UserRecords.findOne({
-                    where: { discord_id: userId },
-                    order: [['createdAt', 'DESC']],
-                });
-
-                const diff = new Date() - new Date(user.LoginHour);
-                const hours = Math.floor(diff / 3600000);
-
-                await UserRecords.update({
-                    LogoutHour: new Date(),
-                    isActive: false,
-                    TotalHours: `User has been active for ${Number(user.TotalHours) + hours} hours.`
-                }, {
-                    where: { discord_id: userId }
-                });
-
-                const updatedUser = await UserRecords.findOne({
-                    where: { discord_id: userId },
-                    order: [['createdAt', 'DESC']],
-                });
-
-                const updatedEmbed = createEmbed('User Records', 'Welcome back to the user records panel.', '#88D66C', updatedUser);
-
-                await buttonInteraction.update(updatedEmbed);
+            try {
+                if (buttonInteraction.customId === 'loginButton') {
+                    await UserRecords.update({
+                        LoginHour: new Date(),
+                        isActive: true
+                    }, {
+                        where: { discord_id: userId }
+                    });
+        
+                    const updatedUser = await UserRecords.findOne({
+                        where: { discord_id: userId },
+                        order: [['createdAt', 'DESC']],
+                    });
+        
+                    const updatedEmbed = createEmbed('User Records', 'Welcome back to the user records panel.', '#88D66C', updatedUser);
+        
+                    await buttonInteraction.update(updatedEmbed);
+                }
+        
+                if (buttonInteraction.customId === 'logoutButton') {
+                    const user = await UserRecords.findOne({
+                        where: { discord_id: userId },
+                        order: [['createdAt', 'DESC']],
+                    });
+        
+                    const diff = new Date() - new Date(user.LoginHour);
+                    const hours = Math.floor(diff / 3600000);
+        
+                    await UserRecords.update({
+                        LogoutHour: new Date(),
+                        isActive: false,
+                        TotalHours: `${Number(user.TotalHours) + hours}`
+                    }, {
+                        where: { discord_id: userId }
+                    });
+        
+                    const updatedUser = await UserRecords.findOne({
+                        where: { discord_id: userId },
+                        order: [['createdAt', 'DESC']],
+                    });
+        
+                    const updatedEmbed = createEmbed('User Records', 'Welcome back to the user records panel.', '#88D66C', updatedUser);
+        
+                    await buttonInteraction.update(updatedEmbed);
+                }
+            } catch (error) {
+                console.error('Error handling button interaction:', error);
+                if (!buttonInteraction.replied) {
+                    await buttonInteraction.reply({ content: 'There was an error processing your request.', ephemeral: true });
+                }
             }
         });
+        
     }
 };
